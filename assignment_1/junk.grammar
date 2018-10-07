@@ -1,0 +1,24 @@
+{
+<start>
+    <person> <verb> <thing>;
+}
+{
+<person>
+    you;
+    me;
+    alice;
+    bob;
+}
+{
+<verb>
+    hit;
+    surprise;
+    annoy;
+}
+{
+<thing>
+    rock;
+    <person>;
+    <thing> on a <thing>;
+}
+
