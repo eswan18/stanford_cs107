@@ -10,6 +10,7 @@ using namespace std;
 
 
 map<string, vector<string> > parse_grammar(string filename);
+string fill_nonterminal(string nonterminal, map<string, vector<string> > grammar);
 
 int main(int argc, char* argv[]){
     // There should be one additional argument beyond the program name, and
@@ -36,6 +37,10 @@ int main(int argc, char* argv[]){
         }
         cout << endl;
     }
+
+    // Recursively generate a sentence starting with nonterminal <start>
+    string random_sentence = fill_nonterminal("start", grammar);
+    cout << random_sentence << endl;
 }
 
 map<string, vector<string> > parse_grammar(string filename) {
@@ -67,4 +72,19 @@ map<string, vector<string> > parse_grammar(string filename) {
         }
     }
     return result;
+}
+
+string fill_nonterminal(string nonterminal, map<string, vector<string> > grammar) {
+    // First check that the nonterminal is in the grammar
+    assert(grammar.count(nonterminal) == 1);
+    // Get the production for the nonterminal
+    vector<string> production = grammar[nonterminal];
+    vector<string>::const_iterator iv;
+    int i = 0;
+    for (iv = production.begin(); iv != production.end(); iv++) {
+        cout << i << ": " << *iv << endl;
+        i++;
+    }
+    cout << endl;
+    return "hi";
 }
