@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <regex>
+#include <random>
 using namespace std;
 
 
@@ -27,17 +28,6 @@ int main(int argc, char* argv[]){
 
     map<string, vector<string> >::const_iterator it;
     vector<string>::const_iterator iv;
-    for (it = grammar.begin(); it != grammar.end(); it++) {
-        cout << "Rule for " << it->first << endl;
-        vector<string> value = it->second;
-        int i = 0;
-        for (iv = value.begin(); iv != value.end(); iv++) {
-            cout << i << ": " << *iv << endl;
-            i++;
-        }
-        cout << endl;
-    }
-
     // Recursively generate a sentence starting with nonterminal <start>
     string random_sentence = fill_nonterminal("start", grammar);
     cout << random_sentence << endl;
@@ -75,16 +65,36 @@ map<string, vector<string> > parse_grammar(string filename) {
 }
 
 string fill_nonterminal(string nonterminal, map<string, vector<string> > grammar) {
-    // First check that the nonterminal is in the grammar
+    // First check that the nonterminal is in the grammar.
     assert(grammar.count(nonterminal) == 1);
-    // Get the production for the nonterminal
-    vector<string> production = grammar[nonterminal];
+    // Get the productions for the nonterminal.
+    vector<string> productions = grammar[nonterminal];
     vector<string>::const_iterator iv;
-    int i = 0;
-    for (iv = production.begin(); iv != production.end(); iv++) {
-        cout << i << ": " << *iv << endl;
-        i++;
+    string result;
+    // Choose a production at random and iterate through it.
+    int n_productions = productions.size();
+    std::random_device rd;     // only used once to initialise (seed) engine
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni(0,n_productions-1); // guaranteed unbiased
+    int choice = uni(rng);
+    string prod = productions[choice];
+    // Iterate through the production and deal with nonterminals.
+    string::const_iterator it;
+    for (it = prod.begin(); it != prod.end(); it++ ) {
+        // If we encounter a '<', we need to parse a nonterminal.
+        if (*it == '<') {
+            string nonterm;
+            // Catch all the letters of the nonterminal.
+            it++;
+            while (*it != '>') {
+                nonterm += *it;
+                it++;
+            }
+            // Call fill_nonterminal on this nonterminal
+            result += fill_nonterminal(nonterm, grammar);
+        } else {
+            result += *it;
+        }
     }
-    cout << endl;
-    return "hi";
+    return result;
 }
